@@ -1,5 +1,11 @@
 ---
 title: "AE 02: Bechdel + data visualization"
+author: "Derek Dubrule"
+studentID: "1705185"
+Date: "Jan 18th, 2026"
+editor: 
+  markdown: 
+    wrap: sentence
 ---
 
 In this mini analysis we work with the data used in the FiveThirtyEight story titled ["The Dollar-And-Cents Case Against Hollywood's Exclusion of Women"](https://fivethirtyeight.com/features/the-dollar-and-cents-case-against-hollywoods-exclusion-of-women/).
@@ -40,19 +46,22 @@ We can use the `glimpse` function to get an overview (or "glimpse") of the data.
 #| label: glimpse
 
 # add code here
+bechdel |>
+  glimpse()
+
 ```
 
 -   What does each observation (row) in the data set represent?
 
-Each observation represents a **\_\_\_**.
+Each observation represents a movie.
 
 -   How many observations (rows) are in the data set?
 
-There are `r nrow(bechdel)` movies in the dataset.
+There are `{r} nrow(bechdel)` movies in the dataset.
 
 -   How many variables (columns) are in the data set?
 
-There are `___` columns in the dataset.
+There are `{r} ncol(bechdel)` columns in the dataset.
 
 ### Variables of interest
 
@@ -119,6 +128,8 @@ ggplot(bechdel, aes(x = budget_2013, y = gross_2013)) +
 Note that this results in a warning as well.
 What does the warning mean?
 
+15 of the 1615 movies are missing from the Graph.
+
 ## Gross revenue vs. budget
 
 ### Step 1 - Your turn
@@ -131,9 +142,10 @@ See <http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf> for many color optio
 
 ```{r}
 #| label: plot-point-color
+#| warning: false
 
 ggplot(bechdel, aes(x = budget_2013, y = gross_2013)) +
-  geom_point(color = "deepskyblue3") 
+  geom_point(color = "#00ff00") 
 ```
 
 ### Step 2 - Your turn
@@ -142,13 +154,14 @@ Add labels for the title and x and y axes.
 
 ```{r}
 #| label: plot-labels
+#| warning: false
 
 ggplot(bechdel, aes(x = budget_2013, y = gross_2013))+
-  geom_point(color = "deepskyblue3") + 
+  geom_point(color = "#00ff00") + 
   labs(
-    x = "___", 
-    y = "___", 
-    title = "___"
+    x = "2013 Budget", 
+    y = "2013 Gross Profit", 
+    title = "Budget vs Gross Profit for movies on 2013"
   )
 ```
 
@@ -167,13 +180,14 @@ Modify the plot below, so the `color` of the points is based on the variable `bi
 
 ```{r}
 #| label: plot-aes-color
+#| warning: false
 
-ggplot(bechdel, aes(x = budget_2013, y = gross_2013)) +
+ggplot(bechdel, aes(x = budget_2013, y = gross_2013, colour = binary)) +
   geom_point() + 
   labs(
     x = "Budget (in 2013 $)", 
     y = "Gross revenue (in 2013 $)", 
-    title = "Gross revenue vs. budget, by ___"
+    title = "Gross revenue vs. budget, by Bechdel test result"
   )
 ```
 
@@ -183,8 +197,17 @@ Expand on your plot from the previous step to make the size of your points based
 
 ```{r}
 #| label: plot-aes-size
-
+#| warning: false
 # add code here
+ggplot(bechdel, aes(x = budget_2013, y = gross_2013, colour = binary, size = roi)) +
+  geom_point() + 
+  labs(
+    x = "Budget (in 2013 $)", 
+    y = "Gross revenue (in 2013 $)", 
+    title = "Gross revenue vs. budget, by Bechdel test result",
+    size = "Return on Investment"
+  )
+
 ```
 
 ### Step 5 - Your turn
@@ -193,8 +216,17 @@ Expand on your plot from the previous step to make the transparency (`alpha`) of
 
 ```{r}
 #| label: plot-aes-alpha
+#| warning: false
 
 # add code here
+ggplot(bechdel, aes(x = budget_2013, y = gross_2013, colour = binary, size = roi)) +
+  geom_point(alpha = 0.5) + 
+  labs(
+    x = "Budget (in 2013 $)", 
+    y = "Gross revenue (in 2013 $)", 
+    title = "Gross revenue vs. budget, by Bechdel test result",
+    size = "Return on Investment"
+  )
 ```
 
 ### Step 6 - Your turn
@@ -203,8 +235,18 @@ Expand on your plot from the previous step by using `facet_wrap` to display the 
 
 ```{r}
 #| label: plot-facet-wrap
+#| warning: false
 
 # add code here
+ggplot(bechdel, aes(x = budget_2013, y = gross_2013, colour = binary, size = roi)) +
+  geom_point(alpha = 0.5) + 
+  facet_wrap(~ clean_test) +
+  labs(
+    x = "Budget (in 2013 $)", 
+    y = "Gross revenue (in 2013 $)", 
+    title = "Gross revenue vs. budget, by Bechdel test result",
+    size = "Return on Investment"
+  )
 ```
 
 ### Step 7 - Demo
@@ -217,8 +259,22 @@ Make use of the [**scales**](https://scales.r-lib.org/) package, specifically th
 
 ```{r}
 #| label: plot-scales
+#| warning: false
 
 # add code here
+ggplot(bechdel, aes(x = budget_2013, y = gross_2013, colour = binary, size = roi,
+                    alpha = 0.5)) +
+  geom_point() + 
+  facet_wrap(~ clean_test) +
+  labs(
+    x = "Budget (in million 2013 $)", 
+    y = "Gross revenue (in million 2013 $)", 
+    title = "Gross revenue vs. budget, by Bechdel test result",
+    size = "Return on Investment"
+  ) +
+  scale_x_continuous(label = label_number(scale = 1/1000000)) +
+  scale_y_continuous(label = label_number(scale = 1/1000000))
+  
 ```
 
 ### Step 8 - Your turn
@@ -228,11 +284,29 @@ Comment on whether this was a useful update.
 
 ```{r}
 #| label: plot-facet-grid
+#| warning: false
 
 # add code here
+ggplot(bechdel, aes(x = budget_2013, y = gross_2013, 
+                    colour = binary, 
+                    size = roi,
+                    alpha = 0.5)) +
+  geom_point() + 
+  facet_grid(clean_test ~ binary) +
+  labs(
+    x = "Budget (in million 2013 $)", 
+    y = "Gross revenue (in million 2013 $)", 
+    title = "Gross revenue vs. budget, by Bechdel test result",
+    size = "Return on Investment"
+  ) +
+  scale_x_continuous(label = label_number(scale = 1/1000000)) +
+  scale_y_continuous(label = label_number(scale = 1/1000000))
+
 ```
 
 Add comment here...
+
+This was a useful update because it shows which combination of clean_test and binary have PASS or FAIL results, but many panels are limited in the data they display.
 
 ### Step 9 - Demo
 
@@ -240,8 +314,26 @@ What other improvements could we make to this plot?
 
 ```{r}
 #| label: plot-improve
+#| warning: false
 
 # add code here
+# code improvements: added a subtitle and alos added a line of best fit.
+ggplot(bechdel, aes(x = budget_2013, y = gross_2013, 
+                    colour = binary, 
+                    size = roi,
+                    alpha = 0.5)) +
+  geom_point() + 
+  geom_smooth(method = "lm", color = "yellow") +
+  facet_grid(clean_test ~ binary) +
+  labs(
+    x = "Budget (in million 2013 $)", 
+    y = "Gross revenue (in million 2013 $)", 
+    title = "Gross revenue vs. budget",
+    subtitle = "Data from the Bechdel test result",
+    size = "Return on Investment"
+  ) +
+  scale_x_continuous(label = label_number(scale = 1/1000000)) +
+  scale_y_continuous(label = label_number(scale = 1/1000000))
 ```
 
 ### Render, commit, and push
